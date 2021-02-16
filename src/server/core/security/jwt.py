@@ -5,9 +5,10 @@ from fastapi import Depends, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from decouple import config
+from starlette.requests import Request
 
 from src.server.core.exceptions.application import ApplicationException
-from src.server.models.auth import TokenData
+from src.server.models.auth import ReadAuthUserModel, Token, TokenData
 from src.server.services.auth import retrieve_auth_user
 
 SECRET_KEY = config("SECRET_KEY")
@@ -37,7 +38,6 @@ async def read_user_token(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
-        print(username)
         if username is None:
             raise credentials_exception
         token_data = TokenData(username=username)
@@ -47,3 +47,28 @@ async def read_user_token(token: str = Depends(oauth2_scheme)):
     if user is None:
         raise credentials_exception
     return user
+
+
+async def read_user_token_from_cookie(access_token: str):
+    if access_token:
+        user = await user_token_data(access_token)
+        if user:
+            return user
+    raise ApplicationException(
+        status.HTTP_401_UNAUTHORIZED,
+        "Invalid credentials",
+        "Could not validate credentials - invalid token or cookie",
+    )
+
+
+async def user_token_data(access_token: str) -> ReadAuthUserModel:
+    try:
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username:
+            token_data = TokenData(username=username)
+            if token_data:
+                return await retrieve_auth_user(token_data.username)
+        return None
+    except JWTError:
+        return None

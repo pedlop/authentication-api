@@ -1,5 +1,5 @@
-def ResponseModel(data, message=None):
-    return {"data": data, "code": 200, "message": message}
+def ResponseModel(data, success: str = None, warning: str = None):
+    return {"data": data, "success_message": success, "warning_message": warning}
 
 
 def ErrorResponseModel(error, code, message):

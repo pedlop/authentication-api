@@ -2,13 +2,16 @@ from fastapi import Response
 from decouple import config
 
 from src.server.models.auth import Token
+from src.server.models.config import Config
 
 
 def set_cookie(response: Response, token: Token, expires_in):
     is_production = config("ENV") == "production"
-    print(is_production, token)
     for key in token:
-        print(key)
+        credential_key = f"{Config.COOKIE_PREFIX.value}{key}"
         response.set_cookie(
-            key=key, value=token[key], expires=expires_in, secure=is_production
+            key=credential_key,
+            value=token[key],
+            expires=expires_in,
+            secure=is_production,
         )

@@ -21,7 +21,6 @@ async def add_auth_user(user_data: dict) -> dict:
 
 
 async def retrieve_auth_user(username: str, pass_on=False) -> dict:
-    print(username)
     user = await users_collection.find_one({"username": username})
     if user:
         return auth_user_helper(user, pass_on)
