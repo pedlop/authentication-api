@@ -1,4 +1,4 @@
-from server.database import users_collection
+from src.server.database import users_collection
 
 
 def auth_user_helper(user, pass_on=False) -> dict:

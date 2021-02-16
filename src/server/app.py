@@ -1,10 +1,9 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-
-from server.routes.student import router as StudentRouter
-from server.routes.auth import router as AuthRouter
-from server.core.exceptions.application import ApplicationException
+from src.server.routes.auth import router as AuthRouter
+from src.server.routes.student import router as StudentRouter
+from src.server.core.exceptions.application import ApplicationException
 
 app = FastAPI()
 

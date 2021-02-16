@@ -1,7 +1,7 @@
 from fastapi import Response
 from decouple import config
 
-from server.models.auth import Token
+from src.server.models.auth import Token
 
 
 def set_cookie(response: Response, token: Token, expires_in):

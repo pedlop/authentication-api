@@ -6,9 +6,9 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from decouple import config
 
-from server.core.exceptions.application import ApplicationException
-from server.models.auth import TokenData
-from server.services.auth import retrieve_auth_user
+from src.server.core.exceptions.application import ApplicationException
+from src.server.models.auth import TokenData
+from src.server.services.auth import retrieve_auth_user
 
 SECRET_KEY = config("SECRET_KEY")
 ALGORITHM = config("ALGORITHM")

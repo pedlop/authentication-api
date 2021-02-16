@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Optional
 
 from fastapi import (
@@ -8,31 +8,23 @@ from fastapi import (
     Response,
     Cookie,
     Depends,
-    FastAPI,
-    HTTPException,
     status,
 )
 from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordRequestForm
 
 
-from server.core.security.jwt import (
+from src.server.core.security.jwt import (
     create_access_token,
     read_user_token,
     ACCESS_TOKEN_EXPIRE_MINUTES,
 )
-from server.core.security.bcrypt import hash_encrypted_text, verify_encrypted_text
-from server.core.security.cookie import set_cookie
-from server.core.exceptions.application import ApplicationException
-from server.models.response import ErrorResponseModel, ResponseModel
-from server.models.auth import (
-    Token,
-    TokenData,
-    TokenClient,
-    AuthUserSchema,
-    ReadAuthUserModel,
-)
-from server.services.auth import add_auth_user, retrieve_auth_user
+from src.server.core.security.bcrypt import hash_encrypted_text, verify_encrypted_text
+from src.server.core.security.cookie import set_cookie
+from src.server.core.exceptions.application import ApplicationException
+from src.server.models.response import ResponseModel
+from src.server.models.auth import AuthUserSchema, ReadAuthUserModel
+from src.server.services.auth import add_auth_user, retrieve_auth_user
 
 
 router = APIRouter()
