@@ -70,7 +70,7 @@ async def signin(
         "access_token": access_token,
         "token_expires": token_expires,
     }
-    set_cookie(response, token, token_expires, request.client.host)
+    set_cookie(response, token, token_expires)
     data = TokenClientModel(True, token_expires, user["id"])
     return ResponseModel(data, f'Welcome {user["username"]}!')
 
@@ -111,7 +111,7 @@ async def signout(
         "access_token": "",
         "token_expires": "",
     }
-    set_cookie(response, token, 0, request.client.host)
+    set_cookie(response, token, 0)
     data = TokenClientModel(False)
     return ResponseModel(data, "See you later!")
 

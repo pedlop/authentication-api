@@ -1,17 +1,14 @@
 from fastapi import Response
+from fastapi.logger import logger
 from decouple import config
 
 from src.server.models.auth import Token
 from src.server.models.config import Config
 
 
-def set_cookie(response: Response, token: Token, expires_in: float, host: str):
+def set_cookie(response: Response, token: Token, expires_in: float):
     is_production = config("ENV") == "production"
-    if host == "127.0.0.1":
-        domain = "localhost"
-    else:
-        domain = host
-    print(domain)
+    domain = config("DOMAIN")
     for key in token:
         credential_key = f"{Config.COOKIE_PREFIX.value}{key}"
         response.set_cookie(
