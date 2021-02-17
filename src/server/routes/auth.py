@@ -70,7 +70,7 @@ async def signin(
         "access_token": access_token,
         "token_expires": token_expires,
     }
-    set_cookie(response, token, token_expires)
+    set_cookie(response, token, token_expires, request.client.host)
     data = TokenClientModel(True, token_expires, user["id"])
     return ResponseModel(data, f'Welcome {user["username"]}!')
 
@@ -103,13 +103,15 @@ async def check_user_authenticate_status(
 
 
 @router.patch("/signout")
-async def signout(response: Response = None) -> ApplicationResponse[TokenClient]:
+async def signout(
+    request: Request = None, response: Response = None
+) -> ApplicationResponse[TokenClient]:
     token = {
         "token_type": "",
         "access_token": "",
         "token_expires": "",
     }
-    set_cookie(response, token, 0)
+    set_cookie(response, token, 0, request.client.host)
     data = TokenClientModel(False)
     return ResponseModel(data, "See you later!")
 

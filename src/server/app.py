@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 
 from src.server.routes.auth import router as AuthRouter
 from src.server.routes.student import router as StudentRouter
@@ -9,6 +10,18 @@ app = FastAPI()
 
 app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
 app.include_router(StudentRouter, tags=["Student"], prefix="/students")
+
+origins = [
+    "http://localhost",
+    "http://localhost:4201",
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.exception_handler(ApplicationException)
