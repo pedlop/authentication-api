@@ -65,13 +65,16 @@ async def signin(
     token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     token_data = TokenJwtModel(user["username"], user["id"], user["role"])
     access_token = create_access_token(data=token_data, expires_delta=token_expires)
+    expires_in = (
+        datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    ).isoformat()
     token = {
         "token_type": "bearer",
         "access_token": access_token,
-        "token_expires": token_expires,
+        "token_expires": expires_in,
     }
-    set_cookie(response, token, token_expires)
-    data = TokenClientModel(True, token_expires, user["id"])
+    set_cookie(response, token, expires_in)
+    data = TokenClientModel(True, expires_in, user["id"])
     return ResponseModel(data, f'Welcome {user["username"]}!')
 
 
@@ -95,10 +98,7 @@ async def check_user_authenticate_status(
     ):
         user = await read_user_from_token(pedlop_oauth_access_token)
         if user:
-            expires_in = float(
-                datetime.strptime(pedlop_oauth_token_expires, "%H:%M:%S").minute * 60
-            )
-            data = TokenClientModel(True, expires_in, user["id"])
+            data = TokenClientModel(True, pedlop_oauth_token_expires, user["id"])
     return ResponseModel(data)
 
 

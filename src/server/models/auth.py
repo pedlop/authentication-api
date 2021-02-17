@@ -37,7 +37,7 @@ def TokenJwtModel(username: str, id: str, role: RoleEnum) -> TokenJwt:
 
 
 def TokenClientModel(
-    is_logged: bool, expires_in: int = 0, user_id: str = None
+    is_logged: bool, expires_in: datetime = None, user_id: str = None
 ) -> TokenClient:
     return {"is_logged": is_logged, "expires_in": expires_in, "user_id": user_id}
 
