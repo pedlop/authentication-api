@@ -1,7 +1,5 @@
-from datetime import date, datetime, timedelta
-from src.server.core.utils.utils import current_milli_time
+from datetime import datetime
 from fastapi import Response
-from fastapi.logger import logger
 from decouple import config
 
 from src.server.models.auth import Token

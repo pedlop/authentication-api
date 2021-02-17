@@ -10,7 +10,6 @@ from fastapi import (
     Cookie,
     Depends,
 )
-from fastapi.encoders import jsonable_encoder
 from fastapi.security import OAuth2PasswordRequestForm
 
 
