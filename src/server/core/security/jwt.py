@@ -29,31 +29,18 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def read_user_token(token: str = Depends(oauth2_scheme)):
-    credentials_exception = ApplicationException(
-        status.HTTP_401_UNAUTHORIZED,
-        "Invalid credentials",
-        "Could not validate credentials",
-    )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise credentials_exception
-        token_data = TokenData(username=username)
-    except JWTError:
-        raise credentials_exception
-    user = await retrieve_auth_user(token_data.username)
-    if user is None:
-        raise credentials_exception
-    return user
-
-
-async def read_user_token_from_cookie(access_token: str):
+async def read_user_from_token(access_token: str) -> ReadAuthUserModel:
     if access_token:
         user = await user_token_data(access_token)
-        if user:
+        if user and user["disabled"] is False:
+            del user["disabled"]
             return user
+        else:
+            raise ApplicationException(
+                status.HTTP_400_BAD_REQUEST,
+                "Inactive user",
+                "This user has been disabled or does not exist",
+            )
     raise ApplicationException(
         status.HTTP_401_UNAUTHORIZED,
         "Invalid credentials",

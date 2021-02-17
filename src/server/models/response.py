@@ -1,3 +1,15 @@
+from typing import TypeVar, Generic
+from pydantic import BaseModel
+
+T = TypeVar("T")
+
+
+class ApplicationResponse(Generic[T]):
+    data: T
+    success_message: str
+    warning_message: str
+
+
 def ResponseModel(data, success: str = None, warning: str = None):
     return {"data": data, "success_message": success, "warning_message": warning}
 

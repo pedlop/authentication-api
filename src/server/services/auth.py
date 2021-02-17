@@ -1,3 +1,5 @@
+from datetime import datetime
+from bson.objectid import ObjectId
 from fastapi import status
 
 from pymongo import errors as MongoErrors
@@ -13,9 +15,12 @@ def auth_user_helper(user, pass_on=False) -> dict:
         "email": user["email"],
         "full_name": user["full_name"],
         "disabled": user["disabled"],
+        "created_at": user["created_at"],
+        "updated_at": user["updated_at"],
     }
     if pass_on:
         data["password"] = user["password"]
+        data["role"] = user["role"]
     return data
 
 
@@ -46,3 +51,17 @@ async def retrieve_auth_user(username: str, pass_on=False) -> dict:
             return auth_user_helper(user, pass_on)
     except Exception as e:
         raise ApplicationException(status.HTTP_404_NOT_FOUND, "User not found", str(e))
+
+
+async def update_auth_user(id: str, data: dict) -> bool:
+    if len(data) < 1:
+        return False
+    user = await users_collection.find_one({"_id": ObjectId(id)})
+    if user:
+        data["updated_at"] = datetime.now()
+        updated_user = await users_collection.update_one(
+            {"_id": ObjectId(id)}, {"$set": data}
+        )
+        if updated_user:
+            return True
+        return False

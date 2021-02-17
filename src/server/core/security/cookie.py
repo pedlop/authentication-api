@@ -5,7 +5,7 @@ from src.server.models.auth import Token
 from src.server.models.config import Config
 
 
-def set_cookie(response: Response, token: Token, expires_in):
+def set_cookie(response: Response, token: Token, expires_in: float):
     is_production = config("ENV") == "production"
     for key in token:
         credential_key = f"{Config.COOKIE_PREFIX.value}{key}"
