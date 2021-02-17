@@ -11,6 +11,7 @@ database = client["authentication-sandbox"]
 student_collection = database.get_collection("students_collection")
 users_collection = database.get_collection("users")
 users_collection.create_index("username", unique=True)
+users_collection.create_index("email", unique=True)
 
 
 def student_helper(student) -> dict:
