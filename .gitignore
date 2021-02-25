@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# ngrok
+ngrok.yml
+
+# npm
+package.json

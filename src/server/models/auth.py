@@ -5,6 +5,11 @@ from enum import Enum
 from pydantic import BaseModel, EmailStr, Field
 
 
+class RoleEnum(str, Enum):
+    USER = "USER"
+    ADMIN = "ADMIN"
+
+
 class Token(BaseModel):
     access_token: str
     token_type: str
@@ -19,11 +24,7 @@ class TokenClient(BaseModel):
     is_logged: bool
     expires_in: int
     user_id: str
-
-
-class RoleEnum(str, Enum):
-    USER = "USER"
-    ADMIN = "ADMIN"
+    user_role: RoleEnum
 
 
 class TokenJwt(BaseModel):
@@ -37,9 +38,17 @@ def TokenJwtModel(username: str, id: str, role: RoleEnum) -> TokenJwt:
 
 
 def TokenClientModel(
-    is_logged: bool, expires_in: datetime = None, user_id: str = None
+    is_logged: bool,
+    expires_in: datetime = None,
+    user_id: str = None,
+    user_role: RoleEnum = None,
 ) -> TokenClient:
-    return {"is_logged": is_logged, "expires_in": expires_in, "user_id": user_id}
+    return {
+        "is_logged": is_logged,
+        "expires_in": expires_in,
+        "user_id": user_id,
+        "user_role": user_role,
+    }
 
 
 class AuthUserSchema(BaseModel):
@@ -75,6 +84,8 @@ class ReadAuthUserModel(BaseModel):
                 "username": "joe",
                 "email": "jdoe@x.edu.ng",
                 "full_name": "John Doe",
+                "created_at": "2021-01-17T12:00:00.387+00:00",
+                "updated_at": "2021-01-17T12:00:00.387+00:00",
             }
         }
 

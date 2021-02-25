@@ -8,7 +8,7 @@ from decouple import config
 from starlette.requests import Request
 
 from src.server.core.exceptions.application import ApplicationException
-from src.server.models.auth import ReadAuthUserModel, Token, TokenData
+from src.server.models.auth import ReadAuthUserModel, RoleEnum, Token, TokenData
 from src.server.services.auth import retrieve_auth_user
 
 SECRET_KEY = config("SECRET_KEY")
@@ -29,12 +29,18 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     return encoded_jwt
 
 
-async def read_user_from_token(access_token: str) -> ReadAuthUserModel:
+async def read_user_from_token(
+    access_token: str, permission: RoleEnum = None
+) -> ReadAuthUserModel:
     if access_token:
         user = await user_token_data(access_token)
+        print(user)
         if user and user["disabled"] is False:
             del user["disabled"]
-            return user
+            if permission == None:
+                return user
+            elif user["role"] == permission:
+                return user
         else:
             raise ApplicationException(
                 status.HTTP_400_BAD_REQUEST,
@@ -44,7 +50,7 @@ async def read_user_from_token(access_token: str) -> ReadAuthUserModel:
     raise ApplicationException(
         status.HTTP_401_UNAUTHORIZED,
         "Invalid credentials",
-        "Could not validate credentials - invalid token or cookie",
+        "Could not validate credentials - invalid token, cookie or permission",
     )
 
 

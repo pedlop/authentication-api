@@ -3,13 +3,11 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.server.routes.auth import router as AuthRouter
-from src.server.routes.student import router as StudentRouter
 from src.server.core.exceptions.application import ApplicationException
 
 app = FastAPI()
 
 app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
-app.include_router(StudentRouter, tags=["Student"], prefix="/students")
 
 origins = [
     "http://localhost",

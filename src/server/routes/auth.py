@@ -30,7 +30,12 @@ from src.server.models.auth import (
     TokenClientModel,
     TokenJwtModel,
 )
-from src.server.services.auth import add_auth_user, retrieve_auth_user, update_auth_user
+from src.server.services.auth import (
+    add_auth_user,
+    retrieve_all_users,
+    retrieve_auth_user,
+    update_auth_user,
+)
 from src.server.core.utils.utils import object_to_mongo_dict
 
 
@@ -73,14 +78,22 @@ async def signin(
         "token_expires": expires_in,
     }
     set_cookie(response, token, expires_in)
-    data = TokenClientModel(True, expires_in, user["id"])
+    data = TokenClientModel(True, expires_in, user["id"], user["role"])
     return ResponseModel(data, f'Welcome {user["username"]}!')
 
 
-@router.get("/profile")
-async def read_users_me(pedlop_oauth_access_token: Optional[str] = Cookie(None)):
-    data = await read_user_from_token(pedlop_oauth_access_token)
-    return ResponseModel(data)
+@router.patch("/signout")
+async def signout(
+    request: Request = None, response: Response = None
+) -> ApplicationResponse[TokenClient]:
+    token = {
+        "token_type": "",
+        "access_token": "",
+        "token_expires": "",
+    }
+    set_cookie(response, token, 0)
+    data = TokenClientModel(False)
+    return ResponseModel(data, "See you later!")
 
 
 @router.get("/check")
@@ -97,22 +110,35 @@ async def check_user_authenticate_status(
     ):
         user = await read_user_from_token(pedlop_oauth_access_token)
         if user:
-            data = TokenClientModel(True, pedlop_oauth_token_expires, user["id"])
+            data = TokenClientModel(
+                True, pedlop_oauth_token_expires, user["id"], user["role"]
+            )
     return ResponseModel(data)
 
 
-@router.patch("/signout")
-async def signout(
-    request: Request = None, response: Response = None
-) -> ApplicationResponse[TokenClient]:
-    token = {
-        "token_type": "",
-        "access_token": "",
-        "token_expires": "",
-    }
-    set_cookie(response, token, 0)
-    data = TokenClientModel(False)
-    return ResponseModel(data, "See you later!")
+@router.get("/profile")
+async def read_users_me(pedlop_oauth_access_token: Optional[str] = Cookie(None)):
+    data = await read_user_from_token(pedlop_oauth_access_token)
+    return ResponseModel(data)
+
+
+@router.put("/profile")
+async def update_profile(
+    pedlop_oauth_access_token: Optional[str] = Cookie(None),
+    body: UpdateAuthUserModel = Body(...),
+) -> ApplicationResponse[None]:
+    user = await read_user_from_token(pedlop_oauth_access_token)
+    req = object_to_mongo_dict(body)
+    password = req.get("password")
+    if password:
+        req["password"] = hash_encrypted_text(password)
+    updated_user = await update_auth_user(user["id"], req)
+    if updated_user:
+        return ResponseModel(None, "Auth user has been successfully updated")
+    else:
+        raise ApplicationException(
+            status.HTTP_400_BAD_REQUEST, "Error when resetting password"
+        )
 
 
 @router.put("/reset-password")
@@ -130,20 +156,26 @@ async def reset_password(
         )
 
 
-@router.put("/basics")
-async def update_basics(
-    pedlop_oauth_access_token: Optional[str] = Cookie(None),
+@router.get("/users")
+async def read_users(pedlop_oauth_access_token: Optional[str] = Cookie(None)):
+    await read_user_from_token(pedlop_oauth_access_token, permission="ADMIN")
+    users = await retrieve_all_users()
+    return ResponseModel(users)
+
+
+@router.put("/users/{id}")
+async def read_users(
+    id: str,
     body: UpdateAuthUserModel = Body(...),
-) -> ApplicationResponse[None]:
-    user = await read_user_from_token(pedlop_oauth_access_token)
+    pedlop_oauth_access_token: Optional[str] = Cookie(None),
+):
+    await read_user_from_token(pedlop_oauth_access_token, permission="ADMIN")
     req = object_to_mongo_dict(body)
-    password = req.get("password")
-    if password:
-        req["password"] = hash_encrypted_text(password)
-    updated_user = await update_auth_user(user["id"], req)
+    updated_user = await update_auth_user(id, req)
+    print(updated_user)
     if updated_user:
         return ResponseModel(None, "Auth user has been successfully updated")
     else:
         raise ApplicationException(
-            status.HTTP_400_BAD_REQUEST, "Error when resetting password"
+            status.HTTP_400_BAD_REQUEST, "Error when updating user"
         )

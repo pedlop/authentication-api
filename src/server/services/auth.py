@@ -1,4 +1,6 @@
 from datetime import datetime
+from src.server.models.auth import ReadAuthUserModel
+from typing import List
 from bson.objectid import ObjectId
 from fastapi import status
 
@@ -15,12 +17,13 @@ def auth_user_helper(user, pass_on=False) -> dict:
         "email": user["email"],
         "full_name": user["full_name"],
         "disabled": user["disabled"],
+        "role": user["role"],
         "created_at": user["created_at"],
         "updated_at": user["updated_at"],
     }
     if pass_on:
         data["password"] = user["password"]
-        data["role"] = user["role"]
+        # data["role"] = user["role"]
     return data
 
 
@@ -65,3 +68,15 @@ async def update_auth_user(id: str, data: dict) -> bool:
         if updated_user:
             return True
         return False
+
+
+async def retrieve_all_users() -> List[ReadAuthUserModel]:
+    try:
+        # print(documents)
+        users = []
+        async for doc in users_collection.find():
+            users.append(auth_user_helper(doc))
+        print(users)
+        return users
+    except Exception as e:
+        print(e)
