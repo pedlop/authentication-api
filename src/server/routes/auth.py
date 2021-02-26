@@ -77,7 +77,7 @@ async def signin(
         "access_token": access_token,
         "token_expires": expires_in,
     }
-    set_cookie(response, token, expires_in)
+    set_cookie(response, token, ACCESS_TOKEN_EXPIRE_MINUTES)
     data = TokenClientModel(True, expires_in, user["id"], user["role"])
     return ResponseModel(data, f'Welcome {user["username"]}!')
 

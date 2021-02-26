@@ -12,6 +12,7 @@ app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
 origins = [
     "http://localhost",
     "http://localhost:4201",
+    "https://pedlop.github.io/bank-web/",
 ]
 app.add_middleware(
     CORSMiddleware,
