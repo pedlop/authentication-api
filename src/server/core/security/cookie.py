@@ -10,6 +10,7 @@ def set_cookie(response: Response, token: Token, minutes: int):
     is_production = config("ENV") == "production"
     domain = config("DOMAIN")
     max_age = minutes * 60
+    print(is_production, domain)
     for key in token:
         credential_key = f"{Config.COOKIE_PREFIX.value}{key}"
         response.set_cookie(
@@ -19,4 +20,5 @@ def set_cookie(response: Response, token: Token, minutes: int):
             secure=is_production,
             domain=domain,
             httponly=True,
+            samesite=None,
         )
