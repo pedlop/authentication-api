@@ -20,4 +20,5 @@ def set_cookie(response: Response, token: Token, minutes: int):
             secure=is_production,
             domain=domain,
             httponly=True,
+            samesite=None,
         )
