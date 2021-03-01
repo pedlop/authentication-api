@@ -11,9 +11,9 @@ app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
 
 origins = [
     "http://localhost",
+    "https://pedlop.com",
     "http://localhost:4201",
     "https://pedlop.github.io",
-    "https://cash.pedlop.com",
 ]
 app.add_middleware(
     CORSMiddleware,
