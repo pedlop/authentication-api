@@ -9,15 +9,11 @@ app = FastAPI()
 
 app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
 
-origins = [
-    "http://localhost",
-    "https://pedlop.com",
-    "http://localhost:4201",
-    "https://pedlop.github.io",
-]
+origins = ["http://localhost", "http://localhost:4201"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
+    allow_origin_regex="https://.*\.pedlop\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
