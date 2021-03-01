@@ -109,6 +109,7 @@ async def check_user_authenticate_status(
         and pedlop_oauth_token_expires
     ):
         user = await read_user_from_token(pedlop_oauth_access_token)
+        print("USER: " + user)
         if user:
             data = TokenClientModel(
                 True, pedlop_oauth_token_expires, user["id"], user["role"]
