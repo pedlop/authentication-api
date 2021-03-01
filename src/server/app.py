@@ -22,7 +22,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.add_middleware(TrustedHostMiddleware, allowed_hosts=["pedlop.com", "*.pedlop.com"])
+app.add_middleware(
+    TrustedHostMiddleware, allowed_hosts=["pedlop.com", "*.pedlop.com", "localhost"]
+)
 
 app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
 

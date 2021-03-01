@@ -102,6 +102,7 @@ async def check_user_authenticate_status(
     pedlop_oauth_access_token: Optional[str] = Cookie(None),
     pedlop_oauth_token_expires: Optional[str] = Cookie(None),
 ) -> ApplicationResponse[TokenClient]:
+    print("TOKEN", pedlop_oauth_access_token)
     data = TokenClientModel(False)
     if (
         pedlop_oauth_token_type

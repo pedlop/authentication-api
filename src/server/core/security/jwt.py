@@ -34,7 +34,6 @@ async def read_user_from_token(
 ) -> ReadAuthUserModel:
     if access_token:
         user = await user_token_data(access_token)
-        print(user)
         if user and user["disabled"] is False:
             del user["disabled"]
             if permission == None:
