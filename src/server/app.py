@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
 
 from src.server.routes.auth import router as AuthRouter
 from src.server.core.exceptions.application import ApplicationException
@@ -9,15 +10,21 @@ app = FastAPI()
 
 app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
 
-origins = ["http://localhost", "http://localhost:4201"]
+origins = [
+    "http://localhost",
+    "http://localhost:4201",
+    "https://cash.pedlop.com",
+    "https://oauth.pedlop.com",
+]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex="https://.*\.pedlop\.com",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(TrustedHostMiddleware, allowed_hosts=["pedlop.com", "*.pedlop.com"])
 
 
 @app.exception_handler(ApplicationException)
