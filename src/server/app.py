@@ -8,13 +8,11 @@ from src.server.core.exceptions.application import ApplicationException
 
 app = FastAPI()
 
-app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
 
 origins = [
     "http://localhost",
     "http://localhost:4201",
     "https://cash.pedlop.com",
-    "https://oauth.pedlop.com",
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +23,8 @@ app.add_middleware(
 )
 
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=["pedlop.com", "*.pedlop.com"])
+
+app.include_router(AuthRouter, tags=["Authentication"], prefix="/auth")
 
 
 @app.exception_handler(ApplicationException)
