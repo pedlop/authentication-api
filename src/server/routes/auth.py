@@ -98,10 +98,12 @@ async def signout(
 
 @router.get("/check")
 async def check_user_authenticate_status(
+    request: Request = None,
     pedlop_oauth_token_type: Optional[str] = Cookie(None),
     pedlop_oauth_access_token: Optional[str] = Cookie(None),
     pedlop_oauth_token_expires: Optional[str] = Cookie(None),
 ) -> ApplicationResponse[TokenClient]:
+    print("Req", request.cookies)
     print("TOKEN", pedlop_oauth_access_token)
     data = TokenClientModel(False)
     if (
