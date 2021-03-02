@@ -13,6 +13,7 @@ origins = [
     "http://localhost",
     "http://localhost:4201",
     "https://cash.pedlop.com",
+    "https://coin.pedlop.com",
 ]
 app.add_middleware(
     CORSMiddleware,

@@ -24,6 +24,7 @@ from src.server.core.exceptions.application import ApplicationException
 from src.server.models.response import ApplicationResponse, ResponseModel
 from src.server.models.auth import (
     TokenClient,
+    ReadAuthUserModel,
     AuthUserSchema,
     AuthResetPasswordModel,
     UpdateAuthUserModel,
@@ -40,6 +41,22 @@ from src.server.core.utils.utils import object_to_mongo_dict
 
 
 router = APIRouter()
+
+
+def token_cookie_handler(
+    user: ReadAuthUserModel, response: Response
+) -> ApplicationResponse[TokenClient]:
+    token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    token_data = TokenJwtModel(user["username"], user["id"], user["role"])
+    access_token = create_access_token(data=token_data, expires_delta=token_expires)
+    expires_in = (datetime.now() + token_expires).isoformat()
+    token = {
+        "token_type": "bearer",
+        "access_token": access_token,
+        "token_expires": expires_in,
+    }
+    set_cookie(response, token, ACCESS_TOKEN_EXPIRE_MINUTES)
+    return TokenClientModel(True, user["id"], expires_in, user["role"])
 
 
 @router.post("/signup", response_description="User registered into database")
@@ -66,19 +83,7 @@ async def signin(
         raise exception
     if not verify_encrypted_text(form_data.password, user["password"]):
         raise exception
-    token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    token_data = TokenJwtModel(user["username"], user["id"], user["role"])
-    access_token = create_access_token(data=token_data, expires_delta=token_expires)
-    expires_in = (
-        datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    ).isoformat()
-    token = {
-        "token_type": "bearer",
-        "access_token": access_token,
-        "token_expires": expires_in,
-    }
-    set_cookie(response, token, ACCESS_TOKEN_EXPIRE_MINUTES)
-    data = TokenClientModel(True, expires_in, user["id"], user["role"])
+    data = token_cookie_handler(user, response)
     return ResponseModel(data, f'Welcome {user["username"]}!')
 
 
@@ -114,8 +119,17 @@ async def check_user_authenticate_status(
         user = await read_user_from_token(pedlop_oauth_access_token)
         if user:
             data = TokenClientModel(
-                True, pedlop_oauth_token_expires, user["id"], user["role"]
+                True, user["id"], pedlop_oauth_token_expires, user["role"]
             )
+    return ResponseModel(data)
+
+
+@router.patch("/refresh")
+async def refresh_access_token(
+    pedlop_oauth_access_token: Optional[str] = Cookie(None), response: Response = None
+):
+    user = await read_user_from_token(pedlop_oauth_access_token)
+    data = token_cookie_handler(user, response)
     return ResponseModel(data)
 
 

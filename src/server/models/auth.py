@@ -6,6 +6,7 @@ from pydantic import BaseModel, EmailStr, Field
 
 
 class RoleEnum(str, Enum):
+    GUEST = "GUEST"
     USER = "USER"
     ADMIN = "ADMIN"
 
@@ -39,9 +40,9 @@ def TokenJwtModel(username: str, id: str, role: RoleEnum) -> TokenJwt:
 
 def TokenClientModel(
     is_logged: bool,
-    expires_in: datetime = None,
     user_id: str = None,
-    user_role: RoleEnum = None,
+    expires_in: datetime = None,
+    user_role: RoleEnum = RoleEnum.GUEST,
 ) -> TokenClient:
     return {
         "is_logged": is_logged,
