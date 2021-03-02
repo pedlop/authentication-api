@@ -1,5 +1,8 @@
 from datetime import datetime, timedelta
 from typing import Optional
+import locale
+
+locale.setlocale(locale.LC_ALL, "pt_BR")
 
 from fastapi import (
     APIRouter,
