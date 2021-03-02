@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import Depends, status
+from fastapi import status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 from decouple import config
